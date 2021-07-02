@@ -27,4 +27,13 @@ object DataFrameFunctions extends App {
     .groupBy(lower($"fN")).agg(first($"wtInLbs", ignoreNulls = true)).show()
 
   correctedDF.filter(lower($"jT").isin(List("eng", "teacher"):_*)).show(false)
+
+  val sampleDF = spark.sparkContext.parallelize(List((1, "this is some sample data"),
+    (2, "and even more"))).toDF("id", "text")
+
+  val capitalizeDF = udf((fullString: String, splitter: String) =>
+    fullString.split(splitter).map(_.capitalize).mkString(splitter))
+
+  sampleDF.select($"id", capitalizeDF($"text", lit(" ")).as("text")).show(false)
+
 }
